@@ -1,0 +1,13 @@
+{
+    "name": "SpotInspection",
+    "alias": "spotinspection",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\SpotInspection\\Providers\\SpotInspectionServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

@@ -1,0 +1,9 @@
+{
+    "Auth": true,
+    "AccounManagement": true,
+    "AccountManagement": true,
+    "Lot": true,
+    "OnlineQcControl": true,
+    "SpotInspection": true,
+    "LotConsultation": true
+}

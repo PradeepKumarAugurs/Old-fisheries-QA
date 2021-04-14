@@ -1,0 +1,2513 @@
+@extends('layouts.app')
+@section('title') <title>AccountManagement </title> 
+<style>
+a.add-new-column {
+    border-radius: 50%;
+}
+a.add-new-row {
+    border-radius: 50%;
+}
+</style>
+@endsection
+@section('content')
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Main content -->
+    <section class="content">
+            <h2 class="page-header">Add Producer Profile</h2>
+            <div class="row">
+                <div class="messageDiv">
+                </div>
+                <div class="col-md-12">
+                <!-- Custom Tabs -->
+                <div class="col-md-12">
+                @if(Session::has('success'))
+                    <div class="alert alert-success alert-dismissible show" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <p>{{ Session::get('success') }}</p>
+                    </div>
+                @endif
+                
+                @if (Session::has('errors'))
+                    <div class="alert alert-danger alert-dismissible show" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <p>
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </p>
+                    </div>
+                @endif
+               
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#tab_1" data-toggle="tab">Profile</a></li>
+                        <li><a href="#tab_2" data-toggle="tab">Customization</a></li>
+                        <li><a href="#tab_3" data-toggle="tab">Specs & Sops</a></li>
+                    </ul>
+                    <div class="tab-content">
+                    <div class="tab-pane active" id="tab_1">
+                        <form action="{{ url('accountmanagement/createProducer') }}" id="basicInfoForm" method="post" enctype="multipart/form-data">
+                        @csrf 
+                        <h4>Producer Info</h4>
+                        <div class="row">
+                         <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="name">User Name</label>
+                                            <input type="text" name="name" value="{{old('name')}}" id="name" class="@error('name') is-invalid @enderror form-control" placeholder="Enter User Name">
+                                            @error('name')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror 
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                        <label for="image"></label>
+                                            <input type="file" name="image" id="image" class="form-control @error('image') is-invalid @enderror">
+                                        </div>
+                                        @error('image')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror 
+                                    </div>
+                                </div> <!--  END Row -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <table class="table table-hover table-border">
+                                          <thead>
+                                          <tr>
+                                           <th class="info">Code</th>
+                                           <th class="info" >Alpha Code</th>
+                                          </tr>
+                                          </thead>
+                                          <tbody>
+                                            <tr>
+                                            <td> 
+                                                <input type="text" value="{{old('code')}}" placeholder="Enter Code" name="code" class="form-control @error('code') is-invalid @enderror">
+                                                @error('code')
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror 
+                                            </td>
+                                            <td> 
+                                                <input type="text"  placeholder="Enter Alpha Code" value="{{old('alpha_code')}}" name="alpha_code" class="@error('alpha_code') is-invalid @enderror form-control">
+                                                @error('alpha_code')
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </td>
+                                            </tr>
+                                            
+                                          </tbody>
+                                        </table>
+                                    </div>
+                                </div> <!--  END Row -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table class="table table-hover table-border">
+                                        <tbody>
+                                        <tr>
+                                        <th class="info">Country</th>
+                                        <td>
+                                        <select name="country" id="country" class="form-control @error('country') is-invalid @enderror getCitiesByAjax">
+                                            <option value="">-- Select Country --</option>
+                                            @if(isset($getAllCountries) && count($getAllCountries))
+                                                @foreach($getAllCountries as $country)
+                                                    <option value="{{$country->id}}" @if(old('country')==$country->id) selected  @endif >{{$country->name}}</option>
+                                                @endforeach
+                                            @endif 
+                                        </select>
+                                        @error('country')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                        </td>
+                                        </tr>
+                                        <tr>
+                                        <th class="info">City</th>
+                                        <td>
+                                        <select name="city" id="city" class="form-control @error('city') is-invalid @enderror">
+                                        <option value="">-- Select City --</option>
+                                            @if(old('country'))
+                                            @foreach(Modules\AccountManagement\Entities\City::where('country_id',old('country'))->get() as $value)
+                                               <option value="{{$value->id}}" @if(old('city')==$value->id) selected @endif >{{$value->name}}</option>
+                                            @endforeach
+                                            @endif 
+                                        </select>
+                                        @error('city')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                        </td>
+                                        </tr>
+                                        <tr>
+                                        <th class="info">Address</th>
+                                        <td>
+                                        <input type="text" name="address"   value="{{old('address')}}"  placeholder="Enter Address" class="form-control @error('address') is-invalid @enderror">
+                                        @error('address')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                        </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div> <!-- End of the Row -->
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row"> 
+                                <div class="col-md-12">
+                                    <table class="table table-hover table-border">
+                                        <thead>
+                                        <tr>
+                                        <th class="info">User having access to this producer</th>
+                                        <th class="info">Name of The Leader</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                        <td>
+                                           <div class="form-group">
+                                                <select  class="form-control @error('producerAccess') is-invalid @enderror " name="producerAccess[user_id]">
+                                                    <option value="">-- Select Users --</option>  
+                                                    @if(isset($getAllProducerUser) && count($getAllProducerUser))
+                                                    @foreach($getAllProducerUser as $producer)
+                                                    <option value="{{$producer->id}}" @if(old('producerAccess[user_id]') ==$producer->id ) selected @endif >{{($producer->name=="")?ucfirst($producer->username):ucfirst($producer->name)}}</option> 
+                                                    @endforeach
+                                                    @endif 
+                                                </select>
+                                                @error('producerAccess')
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                           </div>
+                                           <div class="form-group">
+                                                <select  class="form-control @error('producerAccess') is-invalid @enderror " name="producerAccess[user_id]">
+                                                    <option value="">-- Select Users --</option>  
+                                                    @if(isset($getAllProducerUser) && count($getAllProducerUser))
+                                                    @foreach($getAllProducerUser as $producer)
+                                                    <option value="{{$producer->id}}" @if(old('producerAccess[user_id]') ==$producer->id ) selected @endif >{{($producer->name=="")?ucfirst($producer->username):ucfirst($producer->name)}}</option> 
+                                                    @endforeach
+                                                    @endif  
+                                                </select>
+                                                @error('producerAccess')
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                           </div>
+                                           <div class="form-group">
+                                                <select  class="form-control @error('producerAccess') is-invalid @enderror " name="producerAccess[user_id]">
+                                                    <option value="">-- Select Users --</option>  
+                                                    @if(isset($getAllProducerUser) && count($getAllProducerUser))
+                                                    @foreach($getAllProducerUser as $producer)
+                                                    <option value="{{$producer->id}}" @if(old('producerAccess[user_id]') ==$producer->id ) selected @endif >{{($producer->name=="")?ucfirst($producer->username):ucfirst($producer->name)}}</option> 
+                                                    @endforeach
+                                                    @endif 
+                                                </select>
+                                                @error('producerAccess')
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                           </div>
+                                        </td>
+                                        <td> 
+                                            <div class="form-group">
+                                                <select  class="form-control @error('leader_id') is-invalid @enderror " name="leader_id">
+                                                    <option value="">-- Select Leader --</option>  
+                                                    @if(isset($getAllProducerUser) && count($getAllProducerUser))
+                                                    @foreach($getAllProducerUser as $producer)
+                                                    <option value="{{$producer->id}}" @if(old('leader_id')) selected @endif >{{($producer->name=="")?ucfirst($producer->username):ucfirst($producer->name)}}</option> 
+                                                    @endforeach
+                                                    @endif 
+                                                </select>
+                                                @error('leader_id')
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                           </div>
+                                        </td>
+                                        </tr>
+                                        
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div> <!-- End of the Row -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table class="table table-hover table-border">
+                                        <tbody>
+                                        <tr>
+                                            <th class="info">Producer Type</th>
+                                            <td>
+                                                <select  class="form-control @error('producer_type') is-invalid @enderror " name="producer_type">
+                                                    <option value="">-- Select Producer Type --</option>
+                                                    <option @if(old('producer_type')=='1') selected @endif  value="1" >Landbased</option>
+                                                    <option @if(old('producer_type')=='2') selected @endif value="2">Onboard Processing</option>
+                                                </select>
+                                                @error('producer_type')
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div><!-- End fo  the Row -->
+                            
+
+                         </div>
+                        </div>
+                        <h4>Fishing Info</h4>
+                        <input type="hidden" name="sections[0][name]" value="Fishing">
+                        <input type="hidden" name="sections[0][name_key]" value="fishing">
+                        <div class="row">
+                                <div class="col-md-11 table-responsive">
+                                        <table  id="fishing-table" class="table table-border table-striped">
+                                            <thead>
+                                            <tr class="info" >
+                                                <th>
+                                                <input type="text" name="sections[0][custom_fields][0][name]" value="Vissel list" class="form-control">
+                                                <input type="hidden" name="sections[0][custom_fields][0][type]" value="4" class="form-control">
+                                                <input type="hidden" name="sections[0][custom_fields][0][item_list]" value="a,b,c" class="form-control">
+                                                </th>
+                                                <th>
+                                                <input type="text" name="sections[0][custom_fields][1][name]" value="Self Owned" class="form-control">
+                                                <input type="hidden" name="sections[0][custom_fields][1][type]" value="1" class="form-control">
+                                                <input type="hidden" name="sections[0][custom_fields][1][item_list]" value="a,b,c" class="form-control">
+                                                </th>
+                                                <th>
+                                                <input type="text" name="sections[0][custom_fields][2][name]" value="Exclusivity" class="form-control">
+                                                <input type="hidden" name="sections[0][custom_fields][2][type]" value="1" class="form-control">
+                                                <input type="hidden" name="sections[0][custom_fields][2][item_list]" value="a,b,c" class="form-control">
+                                                </th>
+                                                <th>
+                                                <input type="text" name="sections[0][custom_fields][3][name]" value="Priority" class="form-control">
+                                                <input type="hidden" name="sections[0][custom_fields][3][type]" value="1" class="form-control">
+                                                <input type="hidden" name="sections[0][custom_fields][3][item_list]" value="a,b,c" class="form-control">
+                                                </th>
+                                                <th>
+                                                <input type="text" name="sections[0][custom_fields][4][name]" value="Capacity" class="form-control">
+                                                <input type="hidden" name="sections[0][custom_fields][4][type]" value="1" class="form-control">
+                                                <input type="hidden" name="sections[0][custom_fields][4][item_list]" value="a,b,c" class="form-control">
+                                                </th>
+                                            </tr>
+                                            <thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>
+                                                <input type="text" class="form-control" name="sections[0][custom_rows][0][customdata][0][value]" value="internal Onboard"> 
+                                                
+                                                </td> 
+                                                <td><input type="text" name="sections[0][custom_rows][0][customdata][1][value]" class="form-control">  </td>
+                                                <td><input type="text" name="sections[0][custom_rows][0][customdata][2][value]" class="form-control" > </td>
+                                                <td><input type="text" name="sections[0][custom_rows][0][customdata][3][value]" class="form-control" > </td>
+                                                <td><input type="text" name="sections[0][custom_rows][0][customdata][4][value]" class="form-control" > </td>
+                                               
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                  <select  class="form-control" name="sections[0][custom_rows][1][customdata][0][value]" >
+                                                   <option value="">-- Select vessels--</option>
+                                                   @if(isset($getVesselList) && count($getVesselList))
+                                                   @foreach($getVesselList as $vessel)
+                                                    <option value="{{$vessel->id}}">{{$vessel->vessel_name}}</option>
+                                                   @endforeach
+                                                   @endif 
+                                                  </select>
+                                                </td>
+                                                <td><input type="checkbox" name="sections[0][custom_rows][1][customdata][1][value]" class="minimal" ></td>
+                                                <td><input type="checkbox" name="sections[0][custom_rows][1][customdata][2][value]" class="minimal" ></td>
+                                                <td><input type="checkbox" name="sections[0][custom_rows][1][customdata][3][value]" class="minimal" ></td>
+                                                <td><input type="text" name="sections[0][custom_rows][1][customdata][4][value]"  class="form-control" placeholder="Enter 32.0 mt"> </td>
+                                               
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                  <select  class="form-control" name="sections[0][custom_rows][2][customdata][0][value]" >
+                                                   <option value="">-- Select vessels--</option>
+                                                   @if(isset($getVesselList) && count($getVesselList))
+                                                   @foreach($getVesselList as $vessel)
+                                                    <option value="{{$vessel->id}}">{{$vessel->vessel_name}}</option>
+                                                   @endforeach
+                                                   @endif 
+                                                  </select>
+                                                </td>
+                                                <td><input type="checkbox" name="sections[0][custom_rows][2][customdata][1][value]" class="minimal" ></td>
+                                                <td><input type="checkbox" name="sections[0][custom_rows][2][customdata][2][value]" class="minimal" ></td>
+                                                <td><input type="checkbox" name="sections[0][custom_rows][2][customdata][3][value]" class="minimal" ></td>
+                                                <td><input type="text" name="sections[0][custom_rows][2][customdata][4][value]"  class="form-control" placeholder="Enter 32.0 mt"> </td>
+                                             </tr>
+                                        </table>
+                                       <div class="new_rows_button">
+                                            <a href="javascript:void(0)" data-table="fishing" class="add-new-row btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                       </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <a href="javascript:void(0)" data-table="fishing" class="add-new-column btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                            </div> <!--  END Row -->
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                    <div class="form-group">
+                                    <label for="fao_fishing_zone">FAO Fising Zone</label>
+                                        <select class="form-control" name="fao_fishing_zone">
+                                            <option value="1">Positive Presure</option>
+                                            <option value="2">Peristaltic</option>
+                                            <option value="3">Brail</option>
+                                            <option value="4">Transvac Type</option>
+                                            <option value="5">Manual</option>
+                                        </select>
+                                    </div>
+                            </div>
+                            <div class="col-md-6"></div>
+                        </div> <!--  END Row -->
+                        <h4>Unloading info </h4>
+                        <input type="hidden" name="sections[1][name]" value="Unloading">
+                        <input type="hidden" name="sections[1][name_key]" value="unloading">
+                        <div class="row">
+                                <div class="col-md-11 table-responsive">
+                                <table id="unloading-table" class="table table-border table-striped">
+                                            <thead>
+                                            <tr class="info">
+                                                <th>
+                                                <input type="text" name="sections[1][custom_fields][0][name]" value="Unloading Site" class="form-control">
+                                                <input type="hidden" name="sections[1][custom_fields][0][type]" value="2" class="form-control">
+                                                <input type="hidden" name="sections[1][custom_fields][0][item_list]" value="" class="form-control">
+                                                
+                                                </th>
+                                                <th>
+                                                <input type="text" name="sections[1][custom_fields][1][name]" value="Unloading Type" class="form-control">
+                                                <input type="hidden" name="sections[1][custom_fields][1][type]" value="2" class="form-control">
+                                                <input type="hidden" name="sections[1][custom_fields][1][item_list]" value="" class="form-control">
+                                                </th>
+                                                <th>
+                                                <input type="text" name="sections[1][custom_fields][2][name]" value="Distance" class="form-control">
+                                                <input type="hidden" name="sections[1][custom_fields][2][type]" value="2" class="form-control">
+                                                <input type="hidden" name="sections[1][custom_fields][2][item_list]" value="" class="form-control">
+                                                </th>
+                                                <th>
+                                                <input type="text" name="sections[1][custom_fields][3][name]" value="Typical Trucking Time" class="form-control">
+                                                <input type="hidden" name="sections[1][custom_fields][3][type]" value="2" class="form-control">
+                                                <input type="hidden" name="sections[1][custom_fields][3][item_list]" value="" class="form-control">
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                 <td><input type="text" name="sections[1][custom_rows][0][customdata][0][value]"  class="form-control" placeholder="Enter site"> </td>
+                                                <td> <select class="form-control" name="sections[1][custom_rows][0][customdata][1][value]">
+                                                    <option value="">-- Select Unloading Type--</option>
+                                                    <option value="1">Custom</option>
+                                                    </select>
+                                                </td>
+                                                <td><input type="text" name="sections[1][custom_rows][0][customdata][2][value]" class="form-control" placeholder="Enter Distance"> </td>
+                                                <td><input type="text" name="sections[1][custom_rows][0][customdata][3][value]"  class="form-control" placeholder="Enter Typical Trucking Time"> </td>
+                                                
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <div class="new_rows_button">
+                                            <a href="javascript:void(0)" data-table="unloading" class="add-new-row btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                        </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <a href="javascript:void(0)" data-table="unloading" class="add-new-column btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                            </div> <!--  END Row -->
+                            <h4>Storage At Reception </h4>
+                            <input type="hidden" name="sections[2][name]" value="Storage At Reception">
+                            <input type="hidden" name="sections[2][name_key]" value="storageAtReception">
+                            <div class="row">
+                                <div class="col-md-11 table-responsive">
+                                <table id="storageAtReception-table" class="table table-border table-striped">
+                                            <thead>
+                                                <tr class="info">
+                                                    <th>
+                                                    <input type="text" name="sections[2][custom_fields][0][name]" value="Stroage at Reception" class="form-control">
+                                                    <input type="hidden" name="sections[2][custom_fields][0][type]" value="2" class="form-control">
+                                                    <input type="hidden" name="sections[2][custom_fields][0][item_list]" value="" class="form-control">
+                                                    </th>
+                                                    <th>
+                                                    <input type="text" name="sections[2][custom_fields][1][name]" value="Capacity" class="form-control">
+                                                    <input type="hidden" name="sections[2][custom_fields][1][type]" value="2" class="form-control">
+                                                    <input type="hidden" name="sections[2][custom_fields][1][item_list]" value="" class="form-control">
+                                                    </th>
+                                                    <th>
+                                                    <input type="text" name="sections[2][custom_fields][2][name]" value="DistStorage Typeance" class="form-control">
+                                                    <input type="hidden" name="sections[2][custom_fields][2][type]" value="2" class="form-control">
+                                                    <input type="hidden" name="sections[2][custom_fields][2][item_list]" value="" class="form-control">
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr> 
+                                                <td><input type="text" name="sections[2][custom_rows][0][customdata][0][value]" value="Storage9T" class="form-control"></td>
+                                                <td><input type="text" name="sections[2][custom_rows][0][customdata][1][value]" id="storage" class="form-control" placeholder="Enter 1000 mt"> </td>
+                                                <td> 
+                                                    <select class="form-control" name="sections[2][custom_rows][0][customdata][2][value]">
+                                                        <option value="">-- Select --</option>
+                                                        <option value="1">Totes</option>
+                                                        <option value="2">Pool</option>
+                                                        <option value="3">Dry</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="info">
+                                                    <th>Total</th>
+                                                    <th><input type="text" name="total_capacity_of_storage_reception" value="4234" class="form-control"></th>
+                                                    <th></th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                        <div class="new_rows_button">
+                                            <a href="javascript:void(0)" data-table="storageAtReception" class="add-new-row btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                        </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <a href="javascript:void(0)" data-table="storageAtReception" class="add-new-column btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                                
+                            </div> <!--  END Row -->
+                            <h4>Ice Supply</h4>
+                            <input type="hidden" name="sections[3][name]" value="Ice Supply">
+                            <input type="hidden" name="sections[3][name_key]" value="iceSupply">
+                            <div class="row">
+                                <div class="col-md-11 table-responsive">
+                                <table  id="iceSupply-table" class="table table-border table-striped">
+                                            <thead>
+                                            <tr class="info">
+                                                <th>
+                                                <input type="text" name="sections[3][custom_fields][0][name]" value="Source" class="form-control">
+                                                <input type="hidden" name="sections[3][custom_fields][0][type]" value="4" class="form-control">
+                                                <input type="hidden" name="sections[3][custom_fields][0][item_list]" value="other,own,third-party" class="form-control">
+                                                </th>
+                                                <th>
+                                                <input type="text" name="sections[3][custom_fields][1][name]" value="Capacity" class="form-control">
+                                                <input type="hidden" name="sections[3][custom_fields][1][type]" value="2" class="form-control">
+                                                <input type="hidden" name="sections[3][custom_fields][1][item_list]" value="" class="form-control">
+                                                </th>
+                                                <th>
+                                                <input type="text" name="sections[3][custom_fields][2][name]" value="Type Of Ice" class="form-control">
+                                                <input type="hidden" name="sections[3][custom_fields][2][type]" value="4" class="form-control">
+                                                <input type="hidden" name="sections[3][custom_fields][2][item_list]" value="other,slurry,crush bar,flake" class="form-control">
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td> 
+                                                    <select class="form-control" name="sections[3][custom_rows][0][customdata][0][value]">
+                                                    <option value="">-- Select --</option> 
+                                                    <option value="1">other</option>
+                                                    <option value="2">Own</option>
+                                                    <option value="3">third-party</option>
+                                                    </select>
+                                                </td>
+                                                <td><input type="text" name="sections[3][custom_rows][0][customdata][1][value]" class="form-control" placeholder="Enter 1000 mt/h"> </td>
+                                                <td> <select class="form-control" name="sections[3][custom_rows][0][customdata][2][value]">
+                                                    <option value="">-- Select --</option> 
+                                                    <option value="1">other</option>
+                                                    <option value="2">slurry</option>
+                                                    <option value="3">crush bar</option>
+                                                    <option value="4">flake</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <div class="new_rows_button">
+                                            <a href="javascript:void(0)" data-table="iceSupply" class="add-new-row btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                        </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <a href="javascript:void(0)" data-table="iceSupply" class="add-new-column btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                            </div> <!--  END Row -->
+                            <h4>Grading</h4>
+                            <input type="hidden" name="sections[4][name]" value="Gradding">
+                            <input type="hidden" name="sections[4][name_key]" value="gradding">
+                            <div class="row">
+                                <div class="col-md-11 table-responsive">
+                                <table  id="gradding-table" class="table table-border table-striped">
+                                            <thead>
+                                            <tr class="info">
+                                                <th>
+                                                <input type="text" name="sections[4][custom_fields][0][name]" value="Gradding" class="form-control">
+                                                <input type="hidden" name="sections[4][custom_fields][0][type]" value="2" class="form-control">
+                                                <input type="hidden" name="sections[4][custom_fields][0][item_list]" value="" class="form-control">
+                                                </th>
+                                                <th>
+                                                <input type="text" name="sections[4][custom_fields][1][name]" value="Type" class="form-control">
+                                                <input type="hidden" name="sections[4][custom_fields][1][type]" value="4" class="form-control">
+                                                <input type="hidden" name="sections[4][custom_fields][1][item_list]" value="other,own,third-party" class="form-control">
+                                                </th>
+                                                <th>
+                                                <input type="text" name="sections[4][custom_fields][2][name]" value="Capacity" class="form-control">
+                                                <input type="hidden" name="sections[4][custom_fields][2][type]" value="2" class="form-control">
+                                                <input type="hidden" name="sections[4][custom_fields][2][item_list]" value="" class="form-control">
+                                                </th>
+                                                <th>
+                                                <input type="text" name="sections[4][custom_fields][3][name]" value="# Of Grades" class="form-control">
+                                                <input type="hidden" name="sections[4][custom_fields][3][type]" value="2" class="form-control">
+                                                <input type="hidden" name="sections[4][custom_fields][3][item_list]" value="" class="form-control">
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td><input type="text"  name="sections[4][custom_rows][0][customdata][0][value]" class="form-control"></td>   
+                                                <td> 
+                                                   <select class="form-control" name="sections[4][custom_rows][0][customdata][1][value]">
+                                                    <option value="">-- Select --</option>
+                                                    <option value="1">Roller Gradder</option>
+                                                    <option value="2">Belt Gradder</option>
+                                                    <option value="3">Weight Gradder</option>
+                                                    </select>
+                                                </td>
+                                                <td><input type="text" name="sections[4][custom_rows][0][customdata][2][value]"  class="form-control" placeholder="Enter granding"> </td>
+                                                <td><input type="text" name="sections[4][custom_rows][0][customdata][3][value]"  class="form-control" placeholder="Enter granding"> </td>
+                                            </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="info">
+                                                    <th>Total</th>
+                                                    <th></th>
+                                                    <th><input type="text" name="total_grading_capacity" value="4234" class="form-control"></th>
+                                                    <th></th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                        <div class="new_rows_button">
+                                            <a href="javascript:void(0)" data-table="gradding" class="add-new-row btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                        </div>
+                                        
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <a href="javascript:void(0)" data-table="gradding" class="add-new-column btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                            </div> <!--  END Row -->
+                            <h4>Wr Processing</h4>
+                            <input type="hidden" name="sections[5][name]" value="WrProcessing">
+                            <input type="hidden" name="sections[5][name_key]" value="WrProcessing">
+                            <div class="row">
+                                <div class="col-md-11 table-responsive">
+                                <table  id="wrProcessing-table" class="table table-border table-striped">
+                                            <thead>
+                                            <tr class="info">
+                                                <th>      
+                                                <input type="text" name="sections[5][custom_fields][0][name]" value="# Of infeed" class="form-control">
+                                                <input type="hidden" name="sections[5][custom_fields][0][type]" value="2" class="form-control">
+                                                <input type="hidden" name="sections[5][custom_fields][0][item_list]" value="" class="form-control">
+                                                </th>
+                                                <th>
+                                                <input type="text" name="sections[5][custom_fields][1][name]" value="Name" class="form-control">
+                                                <input type="hidden" name="sections[5][custom_fields][1][type]" value="2" class="form-control">
+                                                <input type="hidden" name="sections[5][custom_fields][1][item_list]" value="" class="form-control">
+                                                </th>
+                                                <th>
+                                                <input type="text" name="sections[5][custom_fields][2][name]" value="Capacity/Hour" class="form-control">
+                                                <input type="hidden" name="sections[5][custom_fields][2][type]" value="2" class="form-control">
+                                                <input type="hidden" name="sections[5][custom_fields][2][item_list]" value="" class="form-control">
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><input type="text" name="sections[5][custom_rows][0][customdata][0][value]" value="Line1" class="form-control"></td>    
+                                                    <td><input type="text" name="sections[5][custom_rows][0][customdata][1][value]"  class="form-control" placeholder="Enter Line1"> </td>   
+                                                    <td><input type="text" name="sections[5][custom_rows][0][customdata][2][value]"  class="form-control" placeholder="Enter 8 mt/h"> </td> 
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="info">
+                                                    <th>Total</th>
+                                                    <th></th>
+                                                    <th><input type="text" name="total_wr_processing_capacity" value="4234" class="form-control"></th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                        <div class="new_rows_button">
+                                            <a href="javascript:void(0)" data-table="wrProcessing" class="add-new-row btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                        </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <a href="javascript:void(0)" data-table="wrProcessing" class="add-new-column btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                            </div> <!--  END Row -->
+                            <h4>Cutting  Info </h4>
+                            <input type="hidden" name="sections[6][name]" value="Cutting">
+                            <input type="hidden" name="sections[6][name_key]" value="Cutting">
+                            <div class="row">
+                                <div class="col-md-11 table-responsive">
+                                <table id="cuttingReverting-table" class="table table-border table-striped">
+                                            <thead>
+                                           
+                                            <tr class="info">
+                                                <th>      
+                                                <input type="text" name="sections[6][custom_fields][0][name]" value="# Of infeed" class="form-control">
+                                                <input type="hidden" name="sections[6][custom_fields][0][type]" value="2" class="form-control">
+                                                <input type="hidden" name="sections[6][custom_fields][0][item_list]" value="" class="form-control">
+                                                </th>
+                                                <th>
+                                                <input type="text" name="sections[6][custom_fields][1][name]" value="Name" class="form-control">
+                                                <input type="hidden" name="sections[6][custom_fields][1][type]" value="2" class="form-control">
+                                                <input type="hidden" name="sections[6][custom_fields][1][item_list]" value="" class="form-control">
+                                                </th>
+                                                <th>
+                                                <input type="text" name="sections[6][custom_fields][2][name]" value="Capacity/Hour" class="form-control">
+                                                <input type="hidden" name="sections[6][custom_fields][2][type]" value="2" class="form-control">
+                                                <input type="hidden" name="sections[6][custom_fields][2][item_list]" value="" class="form-control">
+                                                </th>
+                                                <th>
+                                                <input type="text" name="sections[6][custom_fields][3][name]" value="# Of Machine" class="form-control">
+                                                <input type="hidden" name="sections[6][custom_fields][3][type]" value="2" class="form-control">
+                                                <input type="hidden" name="sections[6][custom_fields][3][item_list]" value="" class="form-control">
+                                                </th>
+                                            </tr>
+                                           
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <th><input type="text" name="sections[6][custom_rows][0][customdata][0][value]" value="Line1" class="form-control"></th>   
+                                                    <td><input type="text" name="sections[6][custom_rows][0][customdata][1][value]"  class="form-control" placeholder="Enter Cut1"> </td>   
+                                                    <td><input type="text" name="sections[6][custom_rows][0][customdata][2][value]"  class="form-control" placeholder="Enter 3 mt/h"> </td>   
+                                                    <td><input type="text" name="sections[6][custom_rows][0][customdata][3][value]"  class="form-control" placeholder="Enter 8 mt/h"> </td>   
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="info">
+                                                    <th>Total</th>
+                                                    <th></th>
+                                                    <th><input type="text" name="total_cutting_capacity" value="4234" class="form-control"></th>
+                                                    <th></th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                        <div class="new_rows_button">
+                                            <a href="javascript:void(0)" data-table="cuttingReverting" class="add-new-row btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                        </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <a href="javascript:void(0)" data-table="cuttingReverting" class="add-new-column btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                            </div> <!--  END Row -->
+                            <h4>Cutting  Size Info </h4>
+                            <input type="hidden" name="sections[7][name]" value="CuttingSize">
+                            <input type="hidden" name="sections[7][name_key]" value="CuttingSize">
+                            <div class="row">
+                                <div class="col-md-11 table-responsive">
+                                <table  id="cuttingSize-table" class="table table-border table-striped">
+                                    <thead>
+                                    <tr class="info">
+                                        <th>
+                                            <input type="text" name="sections[7][custom_fields][0][name]" value="Name" class="form-control">
+                                            <input type="hidden" name="sections[7][custom_fields][0][type]" value="2" class="form-control">
+                                            <input type="hidden" name="sections[7][custom_fields][0][item_list]" value="" class="form-control">
+                                        </th>
+                                        <th>
+                                            <input type="text" name="sections[7][custom_fields][1][name]" value="From" class="form-control">
+                                            <input type="hidden" name="sections[7][custom_fields][1][type]" value="2" class="form-control">
+                                            <input type="hidden" name="sections[7][custom_fields][1][item_list]" value="" class="form-control">
+                                        </th>
+                                        <th>
+                                            <input type="text" name="sections[7][custom_fields][2][name]" value="To" class="form-control">
+                                            <input type="hidden" name="sections[7][custom_fields][2][type]" value="2" class="form-control">
+                                            <input type="hidden" name="sections[7][custom_fields][2][item_list]" value="" class="form-control">
+                                        </th>
+                                        <th>
+                                            <input type="text" name="sections[7][custom_fields][3][name]" value="Number of Machine" class="form-control">
+                                            <input type="hidden" name="sections[7][custom_fields][3][type]" value="2" class="form-control">
+                                            <input type="hidden" name="sections[7][custom_fields][3][item_list]" value="" class="form-control">
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="text" name="sections[7][custom_rows][0][customdata][0][value]"  class="form-control" placeholder="Enter Cut1"> </td>   
+                                            <td><input type="text" name="sections[7][custom_rows][0][customdata][1][value]"  class="form-control" placeholder="Enter Cut1"> </td>   
+                                            <td><input type="text" name="sections[7][custom_rows][0][customdata][2][value]"  class="form-control" placeholder="Enter 3 mt/h"> </td>   
+                                            <td><input type="text" name="sections[7][custom_rows][0][customdata][3][value]"  class="form-control" placeholder="Enter 8 mt/h"> </td> 
+                                        </tr>
+                                    </tbody>
+                                    </table>
+                                    <div class="new_rows_button">
+                                        <a href="javascript:void(0)" data-table="cuttingSize" class="add-new-row btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <a href="javascript:void(0)" data-table="cuttingSize" class="add-new-column btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                            </div> <!--  END Row -->
+                            <h4>Batch Freezing Info </h4>
+                            <input type="hidden" name="sections[8][name]" value="FreezingBatch">
+                            <input type="hidden" name="sections[8][name_key]" value="FreezingBatch">
+                            <div class="row">
+                                <div class="col-md-11 table-responsive">
+                                <table id="freezingBatch-table" class="table table-border table-striped">
+                                    <thead>
+                                    <tr class="info">
+                                        <th>
+                                            <input type="text" name="sections[8][custom_fields][0][name]" value="Name" class="form-control">
+                                            <input type="hidden" name="sections[8][custom_fields][0][type]" value="2" class="form-control">
+                                            <input type="hidden" name="sections[8][custom_fields][0][item_list]" value="" class="form-control">
+                                        </th>
+                                        <th>
+                                            <input type="text" name="sections[8][custom_fields][1][name]" value="Type" class="form-control">
+                                            <input type="hidden" name="sections[8][custom_fields][1][type]" value="4" class="form-control">
+                                            <input type="hidden" name="sections[8][custom_fields][1][item_list]" value="Static IQF,Blast Freezer,Plaste Freezer" class="form-control">
+                                        </th>
+                                        <th>
+                                            <input type="text" name="sections[8][custom_fields][2][name]" value="Pack" class="form-control">
+                                            <input type="hidden" name="sections[8][custom_fields][2][type]" value="4" class="form-control">
+                                            <input type="hidden" name="sections[8][custom_fields][2][item_list]" value="Loose In Plate,Metal Pan,Plastic crate,carton" class="form-control">
+                                        </th>
+                                        <th>
+                                            <input type="text" name="sections[8][custom_fields][3][name]" value="Capacity/Batch" class="form-control">
+                                            <input type="hidden" name="sections[8][custom_fields][3][type]" value="2" class="form-control">
+                                            <input type="hidden" name="sections[8][custom_fields][3][item_list]" value="" class="form-control">
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="text" name="sections[8][custom_rows][0][customdata][0][value]" value="Freezer1" class="form-control"></td>   
+                                            <td> 
+                                                <select class="form-control" name="sections[8][custom_rows][0][customdata][1][value]">
+                                                    <option value="">-- Select --</option>
+                                                    <option value="1">Static IQF</option>
+                                                    <option value="2">Blast Freezer</option>
+                                                    <option value="3">Plaste Freezer</option>
+                                                </select>  
+                                            </td> 
+                                            <td>
+                                                <select class="form-control" name="sections[8][custom_rows][0][customdata][2][value]">
+                                                    <option value="">-- Select --</option>
+                                                    <option value="1">Loose In Plate</option>
+                                                    <option value="2">Metal Pan</option>
+                                                    <option value="3">Plastic crate</option>
+                                                    <option value="4">carton</option>
+                                                </select> 
+                                            </td>
+                                            <td>
+                                                <input type="text" name="sections[8][custom_rows][0][customdata][3][value]" placeholder="Enter Capacity" class="form-control">
+                                            </td>
+                                        </tr>
+                                        
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="info">
+                                            <td>Total</td>    
+                                            <td></td>   
+                                            <td></td>   
+                                            <td><input type="text" name="total_batch_freezing_capacity"  class="form-control" placeholder="Enter Total"> </td>   
+                                        </tr>
+                                    </tfoot>
+                                    </table>
+                                    <div class="new_rows_button">
+                                        <a href="javascript:void(0)" data-table="freezingBatch" class="add-new-row btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <a href="javascript:void(0)" data-table="freezingBatch" class="add-new-column btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                            </div> <!--  END Row -->
+                            <h4>Continuous Freezing Info </h4>
+                            <input type="hidden" name="sections[9][name]" value="FreezingCountinous">
+                            <input type="hidden" name="sections[9][name_key]" value="FreezingCountinous">
+                            <div class="row">
+                                <div class="col-md-11 table-responsive">
+                                <table  id="freezingCountinous-table" class="table table-border table-striped">
+                                    <thead>
+                                    <tr class="info">
+                                        <th>
+                                            <input type="text" name="sections[9][custom_fields][0][name]" value="Name" class="form-control">
+                                            <input type="hidden" name="sections[9][custom_fields][0][type]" value="2" class="form-control">
+                                            <input type="hidden" name="sections[9][custom_fields][0][item_list]" value="" class="form-control">
+                                        </th>
+                                        <th>
+                                            <input type="text" name="sections[9][custom_fields][1][name]" value="Type" class="form-control">
+                                            <input type="hidden" name="sections[9][custom_fields][1][type]" value="4" class="form-control">
+                                            <input type="hidden" name="sections[9][custom_fields][1][item_list]" value="Static IQF,Blast Freezer,Plaste Freezer" class="form-control">
+                                        </th>
+                                        <th>
+                                            <input type="text" name="sections[9][custom_fields][2][name]" value="Pack" class="form-control">
+                                            <input type="hidden" name="sections[9][custom_fields][2][type]" value="4" class="form-control">
+                                            <input type="hidden" name="sections[9][custom_fields][2][item_list]" value="Loose In Plate,Metal Pan,Plastic crate,carton" class="form-control">
+                                        </th>
+                                        <th>
+                                            <input type="text" name="sections[9][custom_fields][3][name]" value="Capacity/Batch" class="form-control">
+                                            <input type="hidden" name="sections[9][custom_fields][3][type]" value="2" class="form-control">
+                                            <input type="hidden" name="sections[9][custom_fields][3][item_list]" value="" class="form-control">
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="text" name="sections[9][custom_rows][0][customdata][0][value]" value="Freezer1" class="form-control"></td>   
+                                            <td> 
+                                                <select class="form-control" name="sections[9][custom_rows][0][customdata][1][value]">
+                                                    <option value="">-- Select --</option>
+                                                    <option value="1">Static IQF</option>
+                                                    <option value="2">Blast Freezer</option>
+                                                    <option value="3">Plaste Freezer</option>
+                                                </select>  
+                                            </td> 
+                                            <td>
+                                                <select class="form-control" name="sections[9][custom_rows][0][customdata][2][value]">
+                                                    <option value="">-- Select --</option>
+                                                    <option value="1">Loose In Plate</option>
+                                                    <option value="2">Metal Pan</option>
+                                                    <option value="3">Plastic crate</option>
+                                                    <option value="4">carton</option>
+                                                </select> 
+                                            </td>
+                                            <td>
+                                                <input type="text" name="sections[9][custom_rows][0][customdata][3][value]" placeholder="Enter Capacity" class="form-control">
+                                            </td>
+                                        </tr>
+                                        
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="info">
+                                            <td>Total</td>    
+                                            <td></td>   
+                                            <td></td>   
+                                            <td><input type="text" name="total_continuouse_freezing_capacity"  class="form-control" placeholder="Enter Total"> </td>   
+                                        </tr>
+                                    </tfoot>
+                                    </table>
+                                    <div class="new_rows_button">
+                                        <a href="javascript:void(0)" data-table="freezingCountinous" class="add-new-row btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <a href="javascript:void(0)" data-table="freezingCountinous" class="add-new-column btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                            </div> <!--  END Row -->
+                            <h4>Storage </h4>
+                            <input type="hidden" name="sections[10][name]" value="Storage">
+                            <input type="hidden" name="sections[10][name_key]" value="Storage">
+                            <div class="row">
+                                <div class="col-md-11 table-responsive">
+                                <table id="storage-table" class="table table-border table-striped">
+                                    <thead>
+                                    <tr class="info">
+                                        <th>
+                                            <input type="text" name="sections[10][custom_fields][0][name]" value="CS" class="form-control">
+                                            <input type="hidden" name="sections[10][custom_fields][0][type]" value="2" class="form-control">
+                                            <input type="hidden" name="sections[10][custom_fields][0][item_list]" value="" class="form-control">
+                                        </th>
+                                        <th>
+                                            <input type="text" name="sections[10][custom_fields][1][name]" value="Name" class="form-control">
+                                            <input type="hidden" name="sections[10][custom_fields][1][type]" value="2" class="form-control">
+                                            <input type="hidden" name="sections[10][custom_fields][1][item_list]" value="" class="form-control">
+                                        </th>
+                                        <th>
+                                            <input type="text" name="sections[10][custom_fields][2][name]" value="Type" class="form-control">
+                                            <input type="hidden" name="sections[10][custom_fields][2][type]" value="4" class="form-control">
+                                            <input type="hidden" name="sections[10][custom_fields][2][item_list]" value="cold Store,container plug" class="form-control">
+                                        </th>
+                                        <th>
+                                            <input type="text" name="sections[10][custom_fields][3][name]" value="Capacity" class="form-control">
+                                            <input type="hidden" name="sections[10][custom_fields][3][type]" value="2" class="form-control">
+                                            <input type="hidden" name="sections[10][custom_fields][3][item_list]" value="" class="form-control">
+                                        </th>
+                                        <th>
+                                            <input type="text" name="sections[10][custom_fields][4][name]" value="Set Temp" class="form-control">
+                                            <input type="hidden" name="sections[10][custom_fields][4][type]" value="2" class="form-control">
+                                            <input type="hidden" name="sections[10][custom_fields][4][item_list]" value="" class="form-control">
+                                        </th>
+                                        
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="text" name="sections[10][custom_rows][0][customdata][0][value]"  class="form-control" placeholder="Enter Cut1"> </td>   
+                                            <td><input type="text" name="sections[10][custom_rows][0][customdata][1][value]"  class="form-control" placeholder="Enter Cut1"> </td>   
+                                            <td> 
+                                                <select class="form-control" name="sections[10][custom_rows][0][customdata][2][value]">
+                                                    <option value="">-- Select --</option>
+                                                    <option value="1">Cold Store</option>
+                                                    <option value="2">Container plug</option>
+                                                </select> 
+                                            </td>  
+                                            <td><input type="text" name="sections[10][custom_rows][0][customdata][3][value]"  class="form-control" placeholder="Enter 8 mt/h"> </td> 
+                                            <td><input type="text" name="sections[10][custom_rows][0][customdata][4][value]"  class="form-control" placeholder="Enter Total"> </td> 
+                                        </tr>
+                                        
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="info">   
+                                            <td colspan="3">Total</td> 
+                                            <td><input type="text" name="total_storage_capacity"  class="form-control" placeholder="Enter Cut1"> </td> 
+                                            <td></td> 
+                                        </tr>
+                                    </tfoot>
+                                    </table>
+                                    <div class="new_rows_button">
+                                        <a href="javascript:void(0)" data-table="storage" class="add-new-row btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>  
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <a href="javascript:void(0)" data-table="storage" class="add-new-column btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                            </div> <!--  END Row -->
+                            
+                            <h4>Expedition</h4>
+                            <div class="row">
+                                <div class="col-md-11 table-responsive">
+                                    <table id="expedition-table" class="table table-border table-striped table-hover">
+                                       <thead>
+                                       <tr class="info">
+                                           <th>Key</th>
+                                           <th>Value</th>
+                                       </tr>
+                                       </thead>
+                                        <tbody>
+                                           <tr>
+                                               <th class="info"><input type="text" name="expedition[key][]" value="Loading bays" class="form-control"></th>
+                                               <td><input type="text"   name="expedition[value][]" class="form-control" placeholder="Enter Counter"></td>
+                                           </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="new_rows_button">
+                                        <a href="javascript:void(0)" data-table="expedition" class="add-new-row btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <a href="javascript:void(0)" data-table="expedition" class="add-new-column btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div>
+                        </div> <!--  END Row -->
+                        <h4>Transportation </h4>
+                        <input type="hidden" name="sections[11][name]" value="Transportation">
+                        <input type="hidden" name="sections[11][name_key]" value="Transportation">
+                        <div class="row">
+                                <div class="col-md-11 table-responsive">
+                                <table  id="transportation-table" class="table table-border table-striped">
+                                    <thead>
+                                    <tr class="info">
+                                        <th>
+                                            <input type="text" name="sections[11][custom_fields][0][name]" value="Shipping Port" class="form-control">
+                                            <input type="hidden" name="sections[11][custom_fields][0][type]" value="2" class="form-control">
+                                            <input type="hidden" name="sections[11][custom_fields][0][item_list]" value="" class="form-control">
+                                        </th>
+                                        <th>
+                                            <input type="text" name="sections[11][custom_fields][1][name]" value="Distance" class="form-control">
+                                            <input type="hidden" name="sections[11][custom_fields][1][type]" value="2" class="form-control">
+                                            <input type="hidden" name="sections[11][custom_fields][1][item_list]" value="" class="form-control">
+                                        </th>
+                                        <th>
+                                            <input type="text" name="sections[11][custom_fields][2][name]" value="Trunking Time" class="form-control">
+                                            <input type="hidden" name="sections[11][custom_fields][2][type]" value="2" class="form-control">
+                                            <input type="hidden" name="sections[11][custom_fields][2][item_list]" value="" class="form-control">
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="text" name="sections[11][custom_rows][0][customdata][0][value]" value="Loading bays" class="form-control"></td> 
+                                            <td><input type="text" name="sections[11][custom_rows][0][customdata][1][value]"  class="form-control" placeholder="Enter 8 mt/h"> </td> 
+                                            <td><input type="text" name="sections[11][custom_rows][0][customdata][2][value]"  class="form-control" placeholder="Enter Total"> </td>  
+                                        </tr>
+                                    </tbody>
+                                    </table>
+                                    <div class="new_rows_button">
+                                        <a href="javascript:void(0)" data-table="transportation" class="add-new-row btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div> 
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <a href="javascript:void(0)" data-table="transportation" class="add-new-column btn btn-xs btn-info"><i class="fa fa-plus"></i></a>
+                                    </div>
+                                </div> 
+                            </div> <!--  END Row -->
+                           
+                            
+                            <h4>Audit Info </h4>
+                            <input type="hidden" name="sections[11][name]" value="Transportation">
+                            <input type="hidden" name="sections[11][name_key]" value="Transportation">
+                            <div class="row">
+                                <div class="col-md-12">
+                                <table class="table table-border table-striped">
+                                <thead>
+                                <tr class="info">
+                                 <th>Title</th>
+                                 <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th>Factory approved by Denis Group appointed auditor?</th>
+                                        <td>
+                                            <label>
+                                            <input type="radio" class="flat-red" name="audit_info[is_factory_approved]" value="yes" > Yes
+                                            </label>
+                                            <label>
+                                            <input type="radio" class="flat-red" name="audit_info[is_factory_approved]" value="no" > No
+                                            </label>
+                                        </td>
+                                       
+                                    </tr>
+                                    <tr>
+                                        <th><label for="code">Date of the audit</label></th> 
+                                        <td><input type="text" name="audit_info[audit_date]" id="audit_date" class="form-control" placeholder="Enter Audit"> </td>
+                                    </tr>
+                                    <tr>
+                                        <th><label for="code">Global Scoring </label></th> 
+                                        <td><input type="text" name="audit_info[scoring]" id="scoring" class="form-control" placeholder="Enter Scoring"> </td>
+                                    </tr>
+                                    <tr>
+                                        <th><label for="code">Row Material </label></th> 
+                                        <td><input type="text" name="audit_info[row_material]" id="row_material" class="form-control" placeholder="Enter Total"> </td>
+                                    </tr>
+                                    <tr>
+                                        <th><label for="code">Processing facilities </label></th> 
+                                        <td><input type="text" name="audit_info[processing_facilities]" id="processing_facilities" class="form-control" placeholder="Enter facilities"> </td>
+                                    </tr>scoring
+                                    <tr>
+                                        <th><label for="code"> Respect of the cold chain </label></th>
+                                        <td><input type="text" name="audit_info[respect_cold_chain]" id="respect_cold_chain" class="form-control" placeholder="Enter Respect"> </td>
+                                    </tr>
+                                    <tr>
+                                        <th><label for="code"> Storage </label></th>
+                                        <td><input type="text" name="audit_info[storage]" id="storage" class="form-control" placeholder="Enter Storages"> </td>
+                                    </tr>
+                                    <tr>
+                                        <th><label for="code"> Traceability </label></th>
+                                        <td><input type="text" name="audit_info[traceability]" id="traceability" class="form-control" placeholder="Enter Traceability"> </td>
+                                    </tr>
+                                </tbody>
+                                </table>
+                                </div>  
+                            </div> <!--  END Row -->
+
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    </div><!-- /.tab-pane -->
+                    
+                    <div class="tab-pane " id="tab_2">
+                        <div class="row">
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label for="company">Producer Name</label>
+                                <p>Del Mar Industrial</p>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                <label for="image">Producer Image</label>
+                                <img src="{{url('images/logo/logo.png')}}" alt="image path not found " srcset="" style="height:100px;">
+                                </div>
+                            </div>
+                        </div> <!--  END Row -->
+                        <h4>Select  the discripancies in the list ( for Online QC ) & specify the rejection value and the border  value</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="checkbox" name="wr_fish" class="minimal" />
+                                    <label for="company">WR fish Online Qc</label>
+                                    @error('company')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror  
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="checkbox" name="cut_fish" class="minimal form_control" >
+                                    <label for="email">Cut fish Online Qc</label>
+                                    @error('email')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div> <!--  END Row -->
+                       
+                        <div class="row">
+                            <div class="col-md-12 table-responsive">
+                                <table  class="table table-border table-striped">
+                                    <thead>
+                                    <tr class="info">
+                                        <th>Discrepancies</th>
+                                        <th>Rejection Value Master Value Offset</th>
+                                        <th>Border Value Master Value Offset</th>
+                                        <th>Images</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td><input type="checkbox" name="visel2" class="minimal" >
+                                        <label for="company">Mechanical Damage</label>
+                                        </td>
+                                        <td> 
+                                        <div class="row"> 
+                                            <div class="col-md-6"> 
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="0.1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="down" class="btn btn-default" onclick="down('0.100')"><span class="glyphicon glyphicon-minus"></span></button>
+                                                        </div>
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="up" class="btn btn-default" onclick="up('100')"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="row"> 
+                                            <div class="col-md-6"> 
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="0.1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="down_btn" class="btn btn-default" onclick="borderDown('0')"><span class="glyphicon glyphicon-minus"></span></button>
+                                                        </div>
+                                                        <input type="text" id="upbtn" class="form-control input-number" value="1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="up_btn" class="btn btn-default" onclick="borderUp('101')"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td><input type="file" name="image" id="image" class="form-control" ></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" name="visel2" class="minimal" >
+                                        <label for="company">Mechanical Damage</label>
+                                        </td>
+                                        <td> 
+                                        <div class="row"> 
+                                            <div class="col-md-6"> 
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="0.1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="down" class="btn btn-default" onclick="down('0.100')"><span class="glyphicon glyphicon-minus"></span></button>
+                                                        </div>
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="up" class="btn btn-default" onclick="up('100')"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="row"> 
+                                            <div class="col-md-6"> 
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="0.1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="down_btn" class="btn btn-default" onclick="borderDown('0')"><span class="glyphicon glyphicon-minus"></span></button>
+                                                        </div>
+                                                        <input type="text" id="upbtn" class="form-control input-number" value="1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="up_btn" class="btn btn-default" onclick="borderUp('101')"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td><input type="file" name="image" id="image" class="form-control" ></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" name="visel2" class="minimal" >
+                                        <label for="company">Mechanical Damage</label>
+                                        </td>
+                                        <td> 
+                                        <div class="row"> 
+                                            <div class="col-md-6"> 
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="0.1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="down" class="btn btn-default" onclick="down('0.100')"><span class="glyphicon glyphicon-minus"></span></button>
+                                                        </div>
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="up" class="btn btn-default" onclick="up('100')"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="row"> 
+                                            <div class="col-md-6"> 
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="0.1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="down_btn" class="btn btn-default" onclick="borderDown('0')"><span class="glyphicon glyphicon-minus"></span></button>
+                                                        </div>
+                                                        <input type="text" id="upbtn" class="form-control input-number" value="1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="up_btn" class="btn btn-default" onclick="borderUp('101')"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td><input type="file" name="image" id="image" class="form-control" ></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" name="visel2" class="minimal" >
+                                        <label for="company">Mechanical Damage</label>
+                                        </td>
+                                        <td> 
+                                        <div class="row"> 
+                                            <div class="col-md-6"> 
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="0.1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="down" class="btn btn-default" onclick="down('0.100')"><span class="glyphicon glyphicon-minus"></span></button>
+                                                        </div>
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="up" class="btn btn-default" onclick="up('100')"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="row"> 
+                                            <div class="col-md-6"> 
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="0.1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="down_btn" class="btn btn-default" onclick="borderDown('0')"><span class="glyphicon glyphicon-minus"></span></button>
+                                                        </div>
+                                                        <input type="text" id="upbtn" class="form-control input-number" value="1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="up_btn" class="btn btn-default" onclick="borderUp('101')"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td><input type="file" name="image" id="image" class="form-control" ></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" name="visel2" class="minimal" >
+                                        <label for="company">Mechanical Damage</label>
+                                        </td>
+                                        <td> 
+                                        <div class="row"> 
+                                            <div class="col-md-6"> 
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="0.1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="down" class="btn btn-default" onclick="down('0.100')"><span class="glyphicon glyphicon-minus"></span></button>
+                                                        </div>
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="up" class="btn btn-default" onclick="up('100')"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="row"> 
+                                            <div class="col-md-6"> 
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="0.1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="down_btn" class="btn btn-default" onclick="borderDown('0')"><span class="glyphicon glyphicon-minus"></span></button>
+                                                        </div>
+                                                        <input type="text" id="upbtn" class="form-control input-number" value="1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="up_btn" class="btn btn-default" onclick="borderUp('101')"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td><input type="file" name="image" id="image" class="form-control" ></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" name="visel2" class="minimal" >
+                                        <label for="company">Mechanical Damage</label>
+                                        </td>
+                                        <td> 
+                                        <div class="row"> 
+                                            <div class="col-md-6"> 
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="0.1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="down" class="btn btn-default" onclick="down('0.100')"><span class="glyphicon glyphicon-minus"></span></button>
+                                                        </div>
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="up" class="btn btn-default" onclick="up('100')"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="row"> 
+                                            <div class="col-md-6"> 
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="0.1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="down_btn" class="btn btn-default" onclick="borderDown('0')"><span class="glyphicon glyphicon-minus"></span></button>
+                                                        </div>
+                                                        <input type="text" id="upbtn" class="form-control input-number" value="1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="up_btn" class="btn btn-default" onclick="borderUp('101')"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td><input type="file" name="image" id="image" class="form-control" ></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" name="visel2" class="minimal" >
+                                        <label for="company">Mechanical Damage</label>
+                                        </td>
+                                        <td> 
+                                        <div class="row"> 
+                                            <div class="col-md-6"> 
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="0.1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="down" class="btn btn-default" onclick="down('0.100')"><span class="glyphicon glyphicon-minus"></span></button>
+                                                        </div>
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="up" class="btn btn-default" onclick="up('100')"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="row"> 
+                                            <div class="col-md-6"> 
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="0.1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="down_btn" class="btn btn-default" onclick="borderDown('0')"><span class="glyphicon glyphicon-minus"></span></button>
+                                                        </div>
+                                                        <input type="text" id="upbtn" class="form-control input-number" value="1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="up_btn" class="btn btn-default" onclick="borderUp('101')"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td><input type="file" name="image" id="image" class="form-control" ></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" name="visel2" class="minimal" >
+                                        <label for="company">Mechanical Damage</label>
+                                        </td>
+                                        <td> 
+                                        <div class="row"> 
+                                            <div class="col-md-6"> 
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="0.1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="down" class="btn btn-default" onclick="down('0.100')"><span class="glyphicon glyphicon-minus"></span></button>
+                                                        </div>
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="up" class="btn btn-default" onclick="up('100')"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="row"> 
+                                            <div class="col-md-6"> 
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" id="myNumber" class="form-control input-number" value="0.1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="down_btn" class="btn btn-default" onclick="borderDown('0')"><span class="glyphicon glyphicon-minus"></span></button>
+                                                        </div>
+                                                        <input type="text" id="upbtn" class="form-control input-number" value="1" />
+                                                        <div class="input-group-btn">
+                                                            <button id="up_btn" class="btn btn-default" onclick="borderUp('101')"><span class="glyphicon glyphicon-plus"></span></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </td>
+                                        <td><input type="file" name="image" id="image" class="form-control" ></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> <!--  END Row -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="checkbox" name="visel" class="minimal" > 
+                                    <label for="vessel"> Every Day </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="checkbox" name="visel" class="minimal" >
+                                    <label for="sequence"> Every Week </label>
+                                </div>
+                            </div>
+                        </div> <!--  END Row -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="checkbox" name="visel" class="minimal" > 
+                                    <label for="vessel"> Every 2 Days </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="checkbox" name="visel" class="minimal" >
+                                    <label for="sequence"> Every 2 Weeks </label>
+                                </div>
+                            </div>
+                        </div> <!--  END Row -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="checkbox" name="visel" class="minimal" > 
+                                    <label for="vessel"> Every 4 Days </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="checkbox" name="visel" class="minimal" >
+                                    <label for="sequence"> Every 3 Weeks </label>
+                                </div>
+                            </div>
+                        </div> <!--  END Row -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="checkbox" name="visel" class="minimal" > 
+                                    <label for="vessel"> Custom Time Scale </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="text" name="name" class="from-control" placeholder="Enter The Day Of Value">
+                                    <label for="sequence"> Days </label>
+                                </div>
+                            </div>
+                        </div> <!--  END Row -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-border table-striped">
+                                    <thead>
+                                        <tr class="info">
+                                            <th>Container Set Tempreture </th>
+                                            <th> </th>
+                                            <th> </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                        <input type="checkbox" name="temp"  class="minimal"> 
+                                        <label> -23 Temp </label>
+                                        </td>
+                                        <td>
+                                        <input type="checkbox" name="temp"  class="minimal">
+                                        <label> -24 Temp </label>
+                                        </td>
+                                        <td>
+                                        <input type="checkbox" name="temp"  class="minimal">
+                                        <label> -25 Temp </label>
+                                         </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                        <input type="checkbox" name="visel" class="minimal" > 
+                                        <label for="vessel"> Custom Time Scale </label>
+                                        </td>
+                                        <td></td>
+                                        <td>
+                                        <label>Days</label><input type="text" name="name" class="form-control" placeholder="Enter The Day Of Value">
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> <!--  END Row -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-border table-striped">
+                                    <thead>
+                                        <tr class="info">
+                                            <th>Frequency Control</th>
+                                            <th> </th>
+                                            <th> </th>
+                                            <th> </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="temp"  class="minimal"> 
+                                            <label> 15 min </label>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" name="temp"  class="minimal"> 
+                                            <label> 30 min </label>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" name="temp"  class="minimal">
+                                            <label> 45 min </label>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" name="temp"  class="minimal">
+                                            <label> 1 hour </label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="temp"  class="minimal">
+                                            <label> Other Value </label>
+                                        </td>
+                                        <td></td>
+                                        <td>
+                                        <label> hours </label><input type="text" name="temp"  class="form-control">
+                                           
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> <!--  END Row -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="yes">Yes</label>
+                                    <input type="checkbox" name="yes" id="yes" class="minimal">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                               <div class="form-group">
+                                    <label for="no"> No</label>
+                                    <input type="checkbox" name="no" id="no" class="minimal">
+                                </div>
+                            </div>
+                        </div> <!--  END Row -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-border table-striped">
+                                    <thead>
+                                        <tr class="info">
+                                            <th> Control Frequency</th>
+                                            <th> </th>
+                                            <th> </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="temp"  class="minimal"> 
+                                            <label> Eat Lot </label>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" name="temp"  class="minimal"> 
+                                            <label> Once a day </label>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" name="temp"  class="minimal">
+                                            <label> Only The First Production </label>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> <!--  END Row -->
+                        <div class="row"> 
+                            <div class="col-md-6"> 
+                                <div class="form-group">
+                                    <label>Standdard Drip Loss Value</label>
+                                    <div class="input-group">
+                                        <div class="input-group-btn">
+                                            <button id="down" class="btn btn-default" onclick="removeDown('1')"><span class="glyphicon glyphicon-minus"></span></button>
+                                        </div>
+                                        <input type="text" id="number" class="form-control input-number" value="1" />
+                                        <div class="input-group-btn">
+                                            <button id="up" class="btn btn-default" onclick="addUp('100')"><span class="glyphicon glyphicon-plus"></span></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6"> 
+                                <div class="form-group">
+                                    <label>Standdard guts weight</label>
+                                    <div class="input-group">
+                                        <div class="input-group-btn">
+                                            <button id="down" class="btn btn-default" onclick="removeData('1')"><span class="glyphicon glyphicon-minus"></span></button>
+                                        </div>
+                                        <input type="text" id="number_btn" class="form-control input-number" value="1" />
+                                        <div class="input-group-btn">
+                                            <button id="up" class="btn btn-default" onclick="addData('100')"><span class="glyphicon glyphicon-plus"></span></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!--  END Row -->
+                        <h4>Cold Chain Standards</h4>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-border table-striped">
+                                <thead>
+                                <th></th>
+                                <th>Target Value</th>
+                                <th>Border Value</th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th><label for="code">Fishing</label></th> 
+                                        <td><input type="text" name="audit" id="audit" class="form-control" placeholder="Enter Fishing Value"> </td>
+                                        <td><input type="text" name="audit" id="audit" class="form-control" placeholder="Enter Fishing Value"> </td>
+                                    </tr>
+                                    <tr>
+                                        <th><label for="code">Unloading </label></th> 
+                                        <td><input type="text" name="scoring" id="scoring" class="form-control" placeholder="Enter Unloading Value"> </td>
+                                        <td><input type="text" name="scoring" id="scoring" class="form-control" placeholder="Enter Unloading Value"> </td>
+                                    </tr>
+                                    <tr>
+                                        <th><label for="code">Transport</label></th> 
+                                        <td><input type="text" name="row_material" id="row_material" class="form-control" placeholder="Enter Transport Value"> </td>
+                                        <td><input type="text" name="row_material" id="row_material" class="form-control" placeholder="Enter Transport Value"> </td>
+                                    </tr>
+                                    <tr>
+                                        <th><label for="code">Reception </label></th> 
+                                        <td><input type="text" name="facilities" id="facilities" class="form-control" placeholder="Enter Reception Value"> </td>
+                                        <td><input type="text" name="facilities" id="facilities" class="form-control" placeholder="Enter Reception Value"> </td>
+                                    </tr>
+                                    <tr>
+                                        <th><label for="code"> Production </label></th>
+                                        <td><input type="text" name="respect" id="respect" class="form-control" placeholder="Enter Production Value"> </td>
+                                        <td><input type="text" name="respect" id="respect" class="form-control" placeholder="Enter Production Value"> </td>
+                                    </tr>
+                                    <tr>
+                                        <th><label for="code"> Freezing </label></th>
+                                        <td><input type="text" name="storages" id="storages" class="form-control" placeholder="Enter Freezing Value"> </td>
+                                        <td><input type="text" name="storages" id="storages" class="form-control" placeholder="Enter Freezing Value"> </td>
+                                    </tr>
+                                    <tr>
+                                        <th><label for="code"> Storage </label></th>
+                                        <td><input type="text" name="traceability" id="traceability" class="form-control" placeholder="Enter Storage Value"> </td>
+                                        <td><input type="text" name="traceability" id="traceability" class="form-control" placeholder="Enter Storage Value"> </td>
+                                    </tr>
+                                </tbody>
+                                </table>
+                            </div>  
+                        </div> <!--  END Row -->
+                        <button type="submit" class="btn btn-primary">Add Customization</button>
+                    </div><!-- /.tab-pane -->
+
+
+                    <div class="tab-pane " id="tab_3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="identification">Producer Name</label>
+                                    <input type="text" name="producer_name" id="producer_name" class="form-control" placeholder="Enter Producer Name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                               <div class="form-group">
+                                    <label for="image">Producer Image</label>
+                                    <input type="file" name="image" id="image" class="form-control">
+                                </div>
+                            </div>
+                        </div> <!--  END Row -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="identification">Production & Storage Facilities</label>
+                                    <textarea name="producer_name" class="form-control" placeholder="Enter Producer Name"></textarea>
+                                </div>
+                            </div>
+                        </div> <!--  END Row -->
+                        <h4> Acceptables Species </h4>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-border table-striped">
+                                    <thead>
+                                        <tr class="info">
+                                            <th> </th>
+                                            <th> Scientific Name</th>
+                                            <th> Common Name</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td><input type="checkbox" name="temp"  class="minimal"></td>
+                                        <td>
+                                            <label>Sardinops Melanosticus </label>
+                                        </td>
+                                        <td>
+                                            <label>Japanes</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" name="temp"  class="minimal"></td>
+                                        <td>
+                                            <label>Sardinops Pichardus </label>
+                                        </td>
+                                        <td>
+                                            <label>European</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" name="temp"  class="minimal"></td>
+                                        <td>
+                                            <label>Sardinops Occiliaus </label>
+                                        </td>
+                                        <td>
+                                            <label>South African Pichards </label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" name="temp"  class="minimal"></td>
+                                        <td>
+                                            <label>Sardinops Sagax </label>
+                                        </td>
+                                        <td>
+                                            <label>Specific Sardine</label>
+                                        </td>
+                                    </tr>
+                                    
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> <!--  END Row -->
+                        <h4> Fresh Fish Organoleptic Test </h4>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-border table-striped">
+                                    <thead>
+                                        <tr class="info">
+                                            <th> Focus </th>
+                                            <th> Quality Parameter </th>
+                                            <th> Target </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td><label>Skin </label></td>
+                                        <td><input type="text" name="sardine" class="form-control" placeholder="Visual Aspect" ></td>
+                                        <td><input type="text" name="sardine" class="form-control" placeholder="Bright,Shining" ></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label>Gill Cover </label></td>
+                                        <td><input type="text" name="sardine" class="form-control" placeholder="Bloodspot" ></td>
+                                        <td><input type="text" name="sardine" class="form-control" placeholder="None" ></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label>Belly </label></td>
+                                        <td><input type="text" name="sardine" class="form-control" placeholder="Resistence" ></td>
+                                        <td><input type="text" name="sardine" class="form-control" placeholder="Strong" ></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label>Flesh </label></td>
+                                        <td><input type="text" name="sardine" class="form-control" placeholder="Texture Smell" ></td>
+                                        <td><input type="text" name="sardine" class="form-control" placeholder="firm,fresh,seaweed/metallic" ></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label>Eyes </label></td>
+                                        <td><input type="text" name="sardine" class="form-control" placeholder="Clearity Shape" ></td>
+                                        <td><input type="text" name="sardine" class="form-control" placeholder="Clear Convex" ></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label>Grills </label></td>
+                                        <td><input type="text" name="sardine" class="form-control" placeholder="Color Smell" ></td>
+                                        <td><input type="text" name="sardine" class="form-control" placeholder="Charatestics bright red, fresh seaweed/metallic"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label>Parasites </label></td>
+                                        <td><input type="text" name="sardine" class="form-control" placeholder="Presence of parasites" ></td>
+                                        <td><input type="text" name="sardine" class="form-control" placeholder="0% Prevalence" ></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> <!--  END Row -->
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-border table-striped">
+                                    <thead>
+                                        <tr class="info">
+                                        <h4> Fish Cut</h4>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                           <input type="checkbox" name="temp" class="minimal">
+                                           <label>H&G-T Cut </label> 
+                                        </td>
+                                        <td>
+                                            <label>Update Files</label>
+                                            <input type="file" name="images"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <input type="checkbox" name="temp"  class="minimal">  
+                                           <label>H&G Cut </label> 
+                                        </td>
+                                        <td>
+                                            <label>Update Files</label>
+                                            <input type="file" name="images"/>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> <!--  END Row -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Weight & Length Specification</label>
+                            </div>
+                        </div> <!--  END Row -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="identification"> Add Sardine</label>
+                                    <input type="text" name="sardine" value="" class="form-control" placeholder="Add Sardine" >
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                               </br></br>
+                                <a href="#" class="fa fa-plus"> Add Sardine </a>
+                            </div>
+                        </div> <!--  END Row -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-border table-striped">
+                                    <thead>
+                                        <tr class="info">
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <label>Sardine Specs</label>
+                                            <input type="checkbox" name="makeral" id="sardineSpec" class="minimal" value="check">  
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> <!--  END Row -->
+                       
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-border table-striped">
+                                    <thead>
+                                        <tr class="info">
+                                            <th></th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="makeral"  class="minimal">  
+                                            <label for="makeral">Makerel Species</label>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" name="makeral_species"  class="minimal">  
+                                            <label for="makeral_species">Add A Species</label>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> <!--  END Row -->
+                        <div class="row">
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label for="identification">Chemical Criteria</label>
+                            </div>
+                            </div>
+                            <div class="col-md-6">
+                               <div class="form-group">
+                                    <a href="#" class="fa fa-plus"> Add A Creiteria </a>
+                                </div>
+                            </div>
+                        </div> <!--  END Row -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-border table-striped">
+                                    <thead>
+                                        <tr class="info">
+                                            <th>Chemical Criateria</th> 
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                           <label>Fat Level  </label> 
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <label>Histamine </label>
+                                        </td>
+                                        <td> 
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td> 
+                                           <label>Domoic Acid</label>
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> <!--  END Row -->
+                        <h4>Heavy Metals</h4>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-border table-striped">
+                                    <thead>
+                                        <tr class="info">
+                                            <th>Heavy Metals</th> 
+                                            <th></th>
+                                            <th>Max limit ppm</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> <!--  END Row -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="microbiological">Microbiological Criteria </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <a href="#" class="fa fa-plus"> Add A Criteria </a>
+                                </div>
+                            </div>
+                        </div> <!--  END Row -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-border table-striped">
+                                    <thead>
+                                        <tr class="info">
+                                            <th>Germs</th> 
+                                            <th>n</th>
+                                            <th>c</th>
+                                            <th>m</th>
+                                            <th>M</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                        <td>
+                                           <input type="" name="" class="form-control" id="" placeholder="" />
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div> <!--  END Row -->
+                        <h4>Specification & Sop's Files</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a href="#"> 1. HGT sardine Specification morocco pdf &nbsp;&nbsp;<span class="fa fa-trash text-danger"></span></a>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="#" class="fa fa-plus"> Add A Document</a>
+                            </div>
+                        </div><!--  END Row -->
+                        
+                        <button type="submit" class="btn btn-primary">Add Sop's</button>
+                        
+                    </div><!-- /.tab-pane -->
+                     
+                </div><!-- nav-tabs-custom -->
+                </div><!-- /.col -->
+            </div>
+    </section>
+</div> 
+
+@endsection
+
+@section('customjs')
+<script>
+
+
+
+
+
+ $(function(){
+        
+       
+        $('.getCitiesByAjax').change(function(){
+            var Id = $(this).val();
+            $.ajax({
+                type: "GET",
+                url: "{{url('accountmanagement/getCitiesByCountryId')}}",
+                data: {"countryId":Id,"_token":"{{ csrf_token() }}"},
+                beforeSend: function() {
+                    //$('.getCitiesByAjax').html('<option><i class="fa fa-spinner fa-spin"></i></option>');
+                },
+                success: function(result){
+                    if(result!=""){
+                        $('#city').html(result);
+                    }
+                }
+            });
+        });
+
+        $('.add-new-column').click(function(e,p){
+            var inputValue = prompt("Please enter your Column name");
+            if (inputValue != null) {
+                $('#'+$(this).attr("data-table")+'-table tr').each(function(e,p){
+                    if(e == '0'){
+                        $(this).append('<th><input type="text" class="form-control" value="'+inputValue+'"></th>');
+                    }
+                    else{
+                        $(this).append(`<td><input type="text" class="form-control" ></td>`);
+                    }
+                });
+            }
+            else{
+                // alert('Enter your Column name'); 
+                console.log('Enter your Column name');
+            }
+        }); 
+        $('.add-new-row').click(function(){
+            console.log('#'+$(this).attr("data-table")+'-table tbody')
+            $('#'+$(this).attr("data-table")+'-table tbody').append(`<tr>${$('#'+$(this).attr("data-table")+'-table tr').eq(1).html()}</tr>`);
+        });
+         //Flat red color scheme for iCheck
+        $('input[type="checkbox"].flat-red, input[type="radio"].flat-red').iCheck({
+          checkboxClass: 'icheckbox_flat-green',
+          radioClass: 'iradio_flat-green'
+        });
+
+        //iCheck for checkbox and radio inputs
+        $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
+          checkboxClass: 'icheckbox_minimal-blue',
+          radioClass: 'iradio_minimal-blue'
+        });
+
+        $('#tutorial').find('tr').each(function(){
+                $(this).find('td').eq(n).after('<td>new cell added</td>');
+        });
+
+        $('input[type=checkbox][name=makeral]').on('ifChecked',  function(){
+            alert('Well done, Sir');
+        });
+
+ });
+
+ 
+
+function up(max) {
+    document.getElementById("myNumber").value = parseInt(document.getElementById("myNumber").value) + 1;
+    if (document.getElementById("myNumber").value >= parseInt(max)) {
+        document.getElementById("myNumber").value = max;
+    }
+}
+function down(min) {
+    document.getElementById("myNumber_down").value = parseInt(document.getElementById("myNumber_down").value) - 0.1;
+    if (document.getElementById("myNumber_down").value <= parseInt(min)) {
+        document.getElementById("myNumber_down").value = min;
+    }
+}
+function borderUp(max) {
+    document.getElementById("upbtn").value = parseInt(document.getElementById("upbtn").value) + 1;
+    if (document.getElementById("upbtn").value >= parseInt(max)) {
+        document.getElementById("upbtn").value = max;
+    }
+}
+function borderDown(min) {
+    document.getElementById("upbtn").value = parseInt(document.getElementById("upbtn").value) - 1;
+    if (document.getElementById("upbtn").value <= parseInt(min)) {
+        document.getElementById("upbtn").value = min;
+    }
+}
+function addUp(max) {
+    document.getElementById("number").value = parseInt(document.getElementById("number").value) + 1;
+    if (document.getElementById("number").value >= parseInt(max)) {
+        document.getElementById("number").value = max;
+    }
+}
+function removeDown(min) {
+    document.getElementById("number").value = parseInt(document.getElementById("number").value) - 1;
+    if (document.getElementById("number").value <= parseInt(min)) {
+        document.getElementById("number").value = min;
+    }
+}
+function addData(max) {
+    document.getElementById("number_btn").value = parseInt(document.getElementById("number_btn").value) + 1;
+    if (document.getElementById("number_btn").value >= parseInt(max)) {
+        document.getElementById("number_btn").value = max;
+    }
+}
+function removeData(min) {
+    document.getElementById("number_btn").value = parseInt(document.getElementById("number_btn").value) - 1;
+    if (document.getElementById("number_btn").value <= parseInt(min)) {
+        document.getElementById("number_btn").value = min;
+    }
+}
+</script>
+
+
+@endsection

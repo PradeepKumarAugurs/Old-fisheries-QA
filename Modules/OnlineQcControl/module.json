@@ -1,0 +1,13 @@
+{
+    "name": "OnlineQcControl",
+    "alias": "onlineqccontrol",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\OnlineQcControl\\Providers\\OnlineQcControlServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

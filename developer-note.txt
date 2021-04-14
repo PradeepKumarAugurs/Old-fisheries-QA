@@ -1,0 +1,277 @@
+sudo apt-get install composer 
+sudo chmod -R ugo+wrx ./
+sudo service apache2 restart
+
+
+=======================
+Taxi 
+---------
+
+username : root
+host : 160.119.253.168
+
+password: !qaz@wsx80#edc
+122.163.176.14
+
+database 
+username : taxi
+password : 0okm(ijn8uhb&
+
+========================
+
+
+define('DB_NAME','salequic_sal');
+define('DB_USER','salequic_saleq');
+define('DB_PASSWORD','[7BQ{1p6mU&z');
+define('DB_HOST','localhost');
+https://salequick.com/front/images/logo-w.png
+
+kir@gmail.com
+
+http://122.163.176.14/salequick_new/
+
+
+Local FTP Details
+------------------
+host: 192.168.1.142
+ OR
+
+ 122.163.176.14
+
+Username: augurs
+Password: A#21il20CSK
+-----
+http://192.168.1.142/phpmyadmin
+Username: Augurs
+Password: Augurs@9848
+
+
+
+TRUNCATE TABLE `audits`;
+TRUNCATE TABLE `authentication_logs`;
+TRUNCATE TABLE `checkings`;
+TRUNCATE TABLE `events_logs`;
+TRUNCATE TABLE `missed_patients`;
+TRUNCATE TABLE `notes_for_patients`;
+TRUNCATE TABLE `patients`;
+TRUNCATE TABLE `patient_returns`;
+TRUNCATE TABLE `pick_ups`;
+
+
+TRUNCATE TABLE `custom_fields`;
+TRUNCATE TABLE `custom_rows`;
+TRUNCATE TABLE `fish_arrivals`;
+TRUNCATE TABLE `custom_producer_data`;
+TRUNCATE TABLE `sections`;
+TRUNCATE TABLE  `lot_parasites`;
+TRUNCATE TABLE `prasites_locations`;
+
+
+
+https://thelernens.com/
+
+
+php artisan clear-compiled 
+composer dump-autoload
+php artisan optimize
+
+
+# php artisan optimize
+# php artisan dump-autoload
+
+composer clear-cache
+----------------
+after rename old  file like  => CopyController.php-Backup
+then => composer dump-autoload
+
+
+after git push 
+this will  be may be resolved 
+
+
+ALTER TABLE `users` ADD `country_code` VARCHAR(3) NULL DEFAULT NULL AFTER `country`;
+
+
+git branch -D ABC
+
+git push --set-upstream origin pradeep
+
+git push --force origin master
+
+
+ALTER TABLE `user_discrepancies` ADD `is_checked` ENUM('0','1') NOT NULL DEFAULT '0' AFTER `border_value`;
+
+
+ALTER TABLE `user_discrepancies` ADD `rejection_value` VARCHAR(191) NULL DEFAULT NULL AFTER `border_offset_value`, ADD `border_value` VARCHAR(191) NULL DEFAULT NULL AFTER `rejection_value`;
+
+
+
+
+
+SELECT D.id,D.user_id,M.id as `acceptable_species_id`,M.scientific_name,M.common_name, D.created_at,D.updated_at as `new_id` FROM `master_accept_species` M left join (select * FROM `acceptable_species` WHERE `user_id`=1) D on M.id=D.acceptable_species_id
+
+
+
+
+===========================================================
+
+ /*if($request->file('logo')){
+            $validator = Validator::make($request->all(), [
+                'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            ]);
+            if ($validator->fails()) { 
+                return response()->json(['error'=>$validator->errors()], 401);            
+            }
+            
+        }
+        if(!empty($request->logo)){
+            $uploaded_image=$request->file('logo')->store('logos');
+            if($uploaded_image){
+                $file_name=substr($uploaded_image,6,200);
+                $updated_data['logo']=$file_name;
+            }
+        }*/
+
+
+========================================
+
+
+
+
+
+
+For multiple Foreign Key  relation 
+==============================
+Package -
+=======================
+compoships awobaz   package 
+
+
+Conect to  live server with username & password 
+===========================================
+    > ssh augurs@122.163.176.14
+    > yes
+    > password 
+    > cd /var/www/html
+
+Conect to  live server with username & key 
+============================================
+    > ssh -i LocationOfKeyFile augurs@122.163.176.14
+    > yes
+    > cd /var/www/html
+
+Goto  Mysql Commond line ->
+==================================
+sudo -s 
+sudo mysql
+
+Export database by  commond  in commond line 
+====================================
+mysqldump -u [user name] –p [password] [options] [database_name] [tablename] > [dumpfilename.sql]
+
+Example :
+-------------
+I Step  -> mysqldump -u Augurs -p fisheriesqa lot_infos>'./dqnew.sql'
+II Step -> database-password
+III Step ->  gedit dqnew.sql
+
+START PHP SERVER 
+-------------------------
+php -S 127.0.0.1:8080
+
+
+
+
+
+New Lot Lucid chart 
+--------------------
+https://lucid.app/lucidchart/247f4e4c-210d-47b1-a3e3-9830a4bfc782/edit?beaconFlowId=4FF305C59FC1810D&page=0_0#?folder_id=home&browser=icon
+
+
+
+
+collection-implode-method
+================================
+
+https://www.itsolutionstuff.com/post/laravel-collection-implode-method-exampleexample.html
+
+Live Wire
+=========================
+https://www.itsolutionstuff.com/post/laravel-livewire-crud-application-tutorialexample.html
+
+
+https://www.jqueryscript.net/demo/Minimal-Tree-Table-jQuery-Plugin-For-Bootstrap-TreeTable/
+https://www.jqueryscript.net/demo/simple-tree-table/
+
+NewtonPass@9848
+
+
+"affiliations" : [
+	 {
+	 	"country_id" : "1",
+	 	"is_checked" : "1",
+	 	"producers" : [
+	 	 {
+	 	 	"producer_id" : "1",
+	 	 	"is_checked" : "1",
+	 	 	"access_is_checked" : "1"
+	 	 }
+	 	]
+	 }	
+	]
+
+
+	
+	------------- TABLE ============
+
+Count of  table (Column)
+-----------------
+document.getElementById('cuttingReverting-table').rows[0].cells.length;
+
+############ Count of  table (Column) #############
+-----------------
+$('#cuttingReverting-table tr').length; 
+
+
+====== Redirect  with  Input data ========
+return Redirect::back()->withInput(Input::all());
+
+
+
+====  Use Another Controleler in a single  Controller =============
+namespace App\Http\Controllers;
+use App\Http\Controllers\Apiauth;
+
+class TestController extends Controller {
+  public function index() {
+    $controller = new Apiauth;
+    return $controller->test();
+  }
+}
+
+Or 
+
+app('App\Http\Controllers\PrintReportController')->getPrintReport();
+
+
+
+git checkout -b old-state e7cca6aad70d776205416a445e1e17b20e745b17
+
+
+
+ServiceProvider not found Laravel 5.0
+----------------------------------------------
+
+Solution is here 
+#########################################
+I solved it myself ,
+
+I tried 
+--- composer dumpautoload -o 
+                      -- so it works for me.
+
+Also some time needs 
+       ------- composer clearcache 
+       
+
+Hope it helps someone else..

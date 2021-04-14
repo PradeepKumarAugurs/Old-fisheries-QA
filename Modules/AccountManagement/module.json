@@ -1,0 +1,13 @@
+{
+    "name": "AccountManagement",
+    "alias": "accountmanagement",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\AccountManagement\\Providers\\AccountManagementServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

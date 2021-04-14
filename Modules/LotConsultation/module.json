@@ -1,0 +1,13 @@
+{
+    "name": "LotConsultation",
+    "alias": "lotconsultation",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\LotConsultation\\Providers\\LotConsultationServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
